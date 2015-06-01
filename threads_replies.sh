@@ -58,7 +58,7 @@ done
 
 # get all thread message_ids for an author keyed on email address
 
-/usr/local/bin/mysql --user=root --database=$DATABASE --execute="
+mysql --user=root --database=$DATABASE --execute="
    select m.subject from messages m, messages_people mp 
           where mp.message_id=m.message_id and mp.email_address like '%$EMAIL%' 
              and mp.type_of_recipient='From' and year(m.first_date)=$YEAR;" > $DIR/threadsubjects-$EMAIL.csv
@@ -96,7 +96,7 @@ fi
 # iterate through the file by line
 
 while read p; do
-  /usr/local/bin/mysql --user=root --database=$DATABASE --execute="
+  mysql --user=root --database=$DATABASE --execute="
      select m.subject, mp.email_address, m.first_date, m.message_id from messages m, messages_people mp 
      where mp.message_id=m.message_id and m.subject like '%$p' 
        and mp.type_of_recipient='From' and year(m.first_date)=$YEAR;" >> $DIR/threadreplies-$EMAIL.csv
