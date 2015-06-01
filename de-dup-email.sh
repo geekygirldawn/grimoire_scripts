@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2015 Dawn M. Foster
+# Licensed under GNU General Public License (GPL), version 3 or later: http://www.gnu.org/licenses/gpl.txt
+
 # The purpose of this script is to make sure I have one email address per person in my mlstats
 # output, so for people using multiple email addresses, replace one email address with a 
 # single main email address.

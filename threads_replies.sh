@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2015 Dawn M. Foster
+# Licensed under GNU General Public License (GPL), version 3 or later: http://www.gnu.org/licenses/gpl.txt
+
 # This script is used with mlstats databases find all of the messages within a certain year
 # that a person has started or replied to. It then retrieves all of the messages within 
 # each thread to find the other people who contributed to the same thread.
