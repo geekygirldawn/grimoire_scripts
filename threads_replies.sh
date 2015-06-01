@@ -17,6 +17,8 @@
 # -d, --database	DATABASE: mlstats database where data can be found for this person
 # -y, --year		YEAR: year that you want the data from
 # -o, --output-dir	DIR: where the output and wip files will be stored. This directory must already exist.
+# -u, --user-mysql	USER: the MySQL username. 
+# -p, --password-mysql	PASS: Not ideal, but you need to pass it a cleartext password.
 
 # set default values for command line arguments
 
@@ -24,6 +26,7 @@ EMAIL=example
 DATABASE=mlstats
 YEAR=2014
 DIR=/tmp
+USER=root
 
 # Read arguments from the command line and store them in variables
 
@@ -44,6 +47,14 @@ case $key in
      YEAR="$2"
      shift
      ;;
+     -u|--user-mysql)
+     USER="$2"
+     shift
+     ;;
+     -p|--password-mysql)
+     PASS="$2"
+     shift
+     ;;
      -o|--output-dir)
      DIR="$2"
      shift
@@ -58,7 +69,7 @@ done
 
 # get all thread message_ids for an author keyed on email address
 
-mysql --user=root --database=$DATABASE --execute="
+mysql --user=$USER --password=$PASS --database=$DATABASE --execute="
    select m.subject from messages m, messages_people mp 
           where mp.message_id=m.message_id and mp.email_address like '%$EMAIL%' 
              and mp.type_of_recipient='From' and year(m.first_date)=$YEAR;" > $DIR/threadsubjects-$EMAIL.csv
@@ -96,7 +107,7 @@ fi
 # iterate through the file by line
 
 while read p; do
-  mysql --user=root --database=$DATABASE --execute="
+  mysql --user=$USER --password=$PASS --database=$DATABASE --execute="
      select m.subject, mp.email_address, m.first_date, m.message_id from messages m, messages_people mp 
      where mp.message_id=m.message_id and m.subject like '%$p' 
        and mp.type_of_recipient='From' and year(m.first_date)=$YEAR;" >> $DIR/threadreplies-$EMAIL.csv
