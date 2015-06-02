@@ -1,10 +1,10 @@
-Scripts for mlstats
+Scripts for Metrics Grimoire
 ==================
 
 Description
 -----------
 This repo contains scripts that I use with [mlstats](https://github.com/MetricsGrimoire/MailingListStats)
-to run queries and do some analysis on the data.
+and [CVSAnaly](https://github.com/MetricsGrimoire/CVSAnalY) to run queries and do some analysis on the data.
 
 Caveats
 -------
@@ -21,14 +21,14 @@ Copyright (C) 2015 Dawn M. Foster
 
 Usage
 -------
-Assumes that you have already used mlstats to populate one or more MySQL databases. Most people will 
+Assumes that you have already used mlstats or CVSAnaly to populate one or more MySQL databases. Most people will 
 have one mlstats database; however, since I'm looking at over a decade of Linux kernel mailing list posts, I've 
 decided to use a separate database for each mailing list.
 
 Read the comments at the top of each script for documentation about using the scripts. There are expected
 arguments and other requirements and expected file configuration, etc.
 
-In general,
+For mlstats scripts:
 
 * Run thread_replies.sh for each person you are interested in and for each mlstats database.
 This means that you might run this script several times for each person.
@@ -39,3 +39,7 @@ then run it through de-dup-email.sh
 * I take this comma separated de-dupped file and run add_timezone.sh, since I forgot to add
 time zones to the original query.
 
+For CVSAnaly scripts:
+
+* Run files_committed.sh to get a list of files committed by specific people. It takes as input
+a list of email addresses.
