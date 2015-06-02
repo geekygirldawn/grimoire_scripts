@@ -36,4 +36,6 @@ This means that you might run this script several times for each person.
 Sometimes need to do some manual clean-up.
 * If I have people using multiple email addresses, I export it into a comma separated CSV and 
 then run it through de-dup-email.sh
+* I take this comma separated de-dupped file and run add_timezone.sh, since I forgot to add
+time zones to the original query.
 
