@@ -104,6 +104,8 @@ then
    rm $DIR/threadreplies-$EMAIL.csv 
 fi
 
+# TODO: add first_date_tz to query to have time zone in addition to date
+
 # iterate through the file by line
 
 while read p; do
