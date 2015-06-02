@@ -62,7 +62,7 @@ if [ -f "$OUTFILE" ]
 then
    cp $OUTFILE /tmp/outputfile.bak
    rm $OUTFILE
-   Echo "Your output file already existed. Original file moved to /tmp/outputfile.bak" 
+   echo "Your output file already existed. Original file moved to /tmp/outputfile.bak" 
 fi
 
 # use comma as separator
