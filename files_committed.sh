@@ -82,22 +82,28 @@ echo "Output stored in $OUTFILE"
 # Loop through input file and generate output file from existing input file data plus time zone data.
 # This was a scrubbed CSV, so I needed to keep the data from the input file CSV, which is different in
 # some cases from what is in the database.
+# i is used as an increment to store temporary outfiles for each email address.
 # Time zone calculation converts seconds from GMT to hours from GMT - see line 80 here:
 # https://github.com/VizGrimoire/VizGrimoireR/blob/alerts/examples/linux/mls-linux.R
 
+i=0
+
 while read EMAIL_ADDRESS; do
-   mysql --user=$USER --password=$PASS --database=$DATABASE -se "select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, file_links.file_path, files.file_name, actions.type, people.id as people_id, people.email from scmlog, people, actions, file_links, files where people.email='shuahkh@osg.samsung.com' and scmlog.author_id=people.id and scmlog.id=actions.commit_id and actions.file_id=file_links.file_id and files.id=file_links.file_id INTO OUTFILE '$OUTFILE' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';"
+   i=$(expr $i + 1)
+   mysql --user=$USER --password=$PASS --database=$DATABASE -se "select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, file_links.file_path, files.file_name, actions.type, people.id as people_id, people.email from scmlog, people, actions, file_links, files where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id and actions.file_id=file_links.file_id and files.id=file_links.file_id INTO OUTFILE '/tmp/outfile$i.csv' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';"
 done < $FILE
 
-# this is the query I need:
+# Create header row as first line in OUTFILE
 
+echo "commit_id,date,timezone,file_id,file_path,file_name,type,people_id,email" > $OUTFILE
 
+# Add header file to beginning of OUTFILE and loop through temporary outfiles to append each to OUTFILE 
+# uses i to know how many times to loop based on last loop and j for current iteration to get each file.
 
-# Create header row and add it to the beginning of the output file.
+for ((j=1;j<=i;j++));
+do
+   cat /tmp/outfile$j.csv >> $OUTFILE
+   rm /tmp/outfile$j.csv
+done
 
-echo "commit_id,date,timezone,file_id,file_path,file_name,type,people_id,email" > /tmp/header_file.csv
-cp $OUTFILE /tmp/outfile.csv
-cat /tmp/header_file.csv /tmp/outfile.csv > $OUTFILE
-
-rm /tmp/header_file.csv /tmp/outfile.csv
  
