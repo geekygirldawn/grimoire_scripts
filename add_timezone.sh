@@ -65,8 +65,9 @@ then
    echo "Your output file already existed. Original file moved to /tmp/outputfile.bak" 
 fi
 
-# use comma as separator
+# use comma as separator, but first store original IFS to restore it later.
 
+OIFS=$IFS
 IFS=,
 
 # Create header row
@@ -84,4 +85,4 @@ while read SUBJECT EMAIL_ADDRESS FIRST_DATE MESSAGE_ID DATABASE; do
    echo "$SUBJECT,$EMAIL_ADDRESS,$FIRST_DATE,$TIMEZONE,$MESSAGE_ID,$DATABASE" >> $OUTFILE
 done < $FILE
 
-
+IFS=$OIFS
