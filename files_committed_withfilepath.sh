@@ -8,7 +8,12 @@
 # their commits, it also displays each file changed in this commit with the type of change made.
 # More details on CVSAnaly: http://metricsgrimoire.github.io/CVSAnalY/
 # Output is of the form:
-# commit_id,date,timezone,file_id,type,people_id,email
+# commit_id,date,timezone,file_id,file_path,file_name,type,people_id,email
+
+# Caveats about file_path and file_name: Need to rely only on the file_id for analysis as filename 
+# and file_path text can be misleading. In some cases, under a single commit, you see a file_id 
+# listed with multiple file_paths or filenames. This occurs when a file has been renamed.
+# CVSAnaly keeps all of the past filenames associated with a commit, which makes sense for some analysis
 
 # Note: this is NOT a general purpose script. I am using this with CVSAnaly and this script
 #       is being used to generate specific output. I will only work in certain cases, and maybe only for me :)
@@ -85,7 +90,7 @@ i=0
 
 while read EMAIL_ADDRESS; do
    i=$(expr $i + 1)
-   mysql --user=$USER --password=$PASS --database=$DATABASE -se "select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id INTO OUTFILE '/tmp/outfile$i.csv' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';"
+   mysql --user=$USER --password=$PASS --database=$DATABASE -se "select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, file_links.file_path, files.file_name, actions.type, people.id as people_id, people.email from scmlog, people, actions, file_links, files where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id and actions.file_id=file_links.file_id and files.id=file_links.file_id INTO OUTFILE '/tmp/outfile$i.csv' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';"
 done < $FILE
 
 # cp $OUTFILE /tmp/outfile.csv
@@ -95,7 +100,7 @@ done < $FILE
 
 # Create header row as first line in OUTFILE
 
-echo "commit_id,date,timezone,file_id,type,people_id,email" > $OUTFILE
+echo "commit_id,date,timezone,file_id,file_path,file_name,type,people_id,email" > $OUTFILE
 
 # Add header file to beginning of OUTFILE and loop through temporary outfiles to append each to OUTFILE 
 # uses i to know how many times to loop based on last loop and j for current iteration to get each file.
