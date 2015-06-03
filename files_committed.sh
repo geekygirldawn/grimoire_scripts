@@ -80,30 +80,24 @@ echo "Output stored in $OUTFILE"
 # i is used as an increment to store temporary outfiles for each email address.
 # Time zone calculation converts seconds from GMT to hours from GMT - see line 80 here:
 # https://github.com/VizGrimoire/VizGrimoireR/blob/alerts/examples/linux/mls-linux.R
+# The first time through the loop, allow mysql to print a header
+# line (no -N parameter) and create the file to be appended in the following loops. Suppress header lines
+# with -N for all but the first iteration.
 
 i=0
 
 while read EMAIL_ADDRESS; do
-   i=$(expr $i + 1)
-   mysql --user=$USER --password=$PASS --database=$DATABASE -se "select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id INTO OUTFILE '/tmp/outfile$i.csv' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';"
+   if [ $i -eq 0 ]; then
+      mysql --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id;" > '/tmp/outfile.csv'
+   else
+      mysql -N --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id;" >> '/tmp/outfile.csv'
+   fi
+   ((i++))
 done < $FILE
 
-# cp $OUTFILE /tmp/outfile.csv
-# cat /tmp/header_file.csv /tmp/outfile.csv > $OUTFILE
+# Convert file from tab delimited to comma delimited. What looks like a space is an embedded tab, since
+# MacOS can't handle \t
 
-# rm /tmp/header_file.csv /tmp/outfile.csv
-
-# Create header row as first line in OUTFILE
-
-echo "commit_id,date,timezone,file_id,type,people_id,email" > $OUTFILE
-
-# Add header file to beginning of OUTFILE and loop through temporary outfiles to append each to OUTFILE 
-# uses i to know how many times to loop based on last loop and j for current iteration to get each file.
-
-for ((j=1;j<=i;j++));
-do
-   cat /tmp/outfile$j.csv >> $OUTFILE
-   rm /tmp/outfile$j.csv
-done
+sed 's/	/,/g' /tmp/outfile.csv > $OUTFILE
 
  
