@@ -42,4 +42,10 @@ time zones to the original query.
 For CVSAnaly scripts:
 
 * Run files_committed.sh to get a list of files committed by specific people. It takes as input
-a list of email addresses.
+a list of email addresses. There are two versions of this script - with an without filenames and 
+filepaths. See the comments at the top of the with filepaths version for explanation.
+* Use collab_file_commits.sh to find all of the people who are collaborating on the same files.
+It takes output from either files_committed script as input. WARNING: this can generate a massive
+amount of data for people who have edited a lot of files or contributed to frequently edited files.
+
+
