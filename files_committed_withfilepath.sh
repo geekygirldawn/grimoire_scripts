@@ -63,7 +63,7 @@ esac
 shift
 done
 
-# If outfile exists, make a backup and remove outfile to avoid appending new data to an old file.
+# If outfile exists, make a backup since it will be overwritten
 
 if [ -f "$OUTFILE" ]
 then
@@ -81,34 +81,28 @@ echo "Output stored in $OUTFILE"
 
 # Loop through input file and generate output file from existing input file data plus time zone data.
 # This was a scrubbed CSV, so I needed to keep the data from the input file CSV, which is different in
-# some cases from what is in the database.
-# i is used as an increment to store temporary outfiles for each email address.
+# some cases from what is in the database. i is an increment to keep track of iteration and only print
+# header for first iteration.
 # Time zone calculation converts seconds from GMT to hours from GMT - see line 80 here:
 # https://github.com/VizGrimoire/VizGrimoireR/blob/alerts/examples/linux/mls-linux.R
 
 i=0
 
 while read EMAIL_ADDRESS; do
-   i=$(expr $i + 1)
-   mysql --user=$USER --password=$PASS --database=$DATABASE -se "select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, file_links.file_path, files.file_name, actions.type, people.id as people_id, people.email from scmlog, people, actions, file_links, files where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id and actions.file_id=file_links.file_id and files.id=file_links.file_id INTO OUTFILE '/tmp/outfile$i.csv' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';"
+    if [ $i -eq 0 ]; then
+      mysql --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, file_links.file_path, files.file_name, actions.type, people.id as people_id, people.email from scmlog, people, actions, file_links, files where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id and actions.file_id=file_links.file_id and files.id=file_links.file_id;" > /tmp/outfile.tsv
+   else
+      mysql -N --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, file_links.file_path, files.file_name, actions.type, people.id as people_id, people.email from scmlog, people, actions, file_links, files where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id and actions.file_id=file_links.file_id and files.id=file_links.file_id;" >> /tmp/outfile.tsv
+   fi
+   ((i++))
 done < $FILE
 
-# cp $OUTFILE /tmp/outfile.csv
-# cat /tmp/header_file.csv /tmp/outfile.csv > $OUTFILE
 
-# rm /tmp/header_file.csv /tmp/outfile.csv
+# Convert file from tab delimited to comma delimited. What looks like a space is an embedded tab, since
+# MacOS can't handle \t
 
-# Create header row as first line in OUTFILE
+sed 's/	/,/g' /tmp/outfile.tsv > $OUTFILE
 
-echo "commit_id,date,timezone,file_id,file_path,file_name,type,people_id,email" > $OUTFILE
+# cleanup and remove temp file
 
-# Add header file to beginning of OUTFILE and loop through temporary outfiles to append each to OUTFILE 
-# uses i to know how many times to loop based on last loop and j for current iteration to get each file.
-
-for ((j=1;j<=i;j++));
-do
-   cat /tmp/outfile$j.csv >> $OUTFILE
-   rm /tmp/outfile$j.csv
-done
-
- 
+rm /tmp/outfile.tsv

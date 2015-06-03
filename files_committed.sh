@@ -76,8 +76,8 @@ echo "Output stored in $OUTFILE"
 
 # Loop through input file and generate output file from existing input file data plus time zone data.
 # This was a scrubbed CSV, so I needed to keep the data from the input file CSV, which is different in
-# some cases from what is in the database.
-# i is used as an increment to store temporary outfiles for each email address.
+# some cases from what is in the database. i is an increment to keep track of iteration and only print
+# header for first iteration.
 # Time zone calculation converts seconds from GMT to hours from GMT - see line 80 here:
 # https://github.com/VizGrimoire/VizGrimoireR/blob/alerts/examples/linux/mls-linux.R
 # The first time through the loop, allow mysql to print a header
@@ -88,9 +88,9 @@ i=0
 
 while read EMAIL_ADDRESS; do
    if [ $i -eq 0 ]; then
-      mysql --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id;" > '/tmp/outfile.csv'
+      mysql --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id;" > /tmp/outfile.tsv
    else
-      mysql -N --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id;" >> '/tmp/outfile.csv'
+      mysql -N --user=$USER --password=$PASS --database=$DATABASE --execute="select scmlog.id as commit_id, scmlog.date, ((scmlog.date_tz div 3600) +36) mod 24 - 12 as timezone, actions.file_id, actions.type, people.id as people_id, people.email from scmlog, people, actions where people.email='$EMAIL_ADDRESS' and scmlog.author_id=people.id and scmlog.id=actions.commit_id;" >> /tmp/outfile.tsv
    fi
    ((i++))
 done < $FILE
@@ -98,6 +98,8 @@ done < $FILE
 # Convert file from tab delimited to comma delimited. What looks like a space is an embedded tab, since
 # MacOS can't handle \t
 
-sed 's/	/,/g' /tmp/outfile.csv > $OUTFILE
+sed 's/	/,/g' /tmp/outfile.tsv > $OUTFILE
 
- 
+# cleanup and remove temp file
+
+rm /tmp/outfile.tsv 
