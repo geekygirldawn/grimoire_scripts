@@ -125,7 +125,8 @@ done
 
 # Replace any existing commas with spaces
 
-sed -i '.bak' "s/,/ /g" /tmp/outfile.tsv
+sed "s/,/ /g" /tmp/outfile.tsv > /tmp/outfile-clean.tsv
+mv /tmp/outfile-clean.tsv /tmp/outfile.tsv
 
 # Convert file from tab delimited to comma delimited. What looks like a space is an embedded tab, since
 # MacOS can't handle \t
