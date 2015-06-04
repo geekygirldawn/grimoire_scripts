@@ -30,22 +30,23 @@ arguments and other requirements and expected file configuration, etc.
 
 For mlstats scripts:
 
-* Run thread_replies.sh for each person you are interested in and for each mlstats database.
+* thread_replies.sh: Run thread_replies.sh for each person you are interested in and for each mlstats database.
 This means that you might run this script several times for each person.
 * I take the final output file and import it into LibreOffice to make it easier to read and 
 Sometimes need to do some manual clean-up.
-* If I have people using multiple email addresses, I export it into a comma separated CSV and 
+* de-dup-email.sh: If I have people using multiple email addresses, I export it into a comma separated CSV and 
 then run it through de-dup-email.sh
-* I take this comma separated de-dupped file and run add_timezone.sh, since I forgot to add
+* add_timezone.sh: I take this comma separated de-dupped file and run add_timezone.sh, since I forgot to add
 time zones to the original query.
 
 For CVSAnaly scripts:
 
-* Run files_committed.sh to get a list of files committed by specific people. It takes as input
+* files_committed.sh: run to get a list of files committed by specific people. It takes as input
 a list of email addresses. There are two versions of this script - with an without filenames and 
 filepaths. See the comments at the top of the with filepaths version for explanation.
-* Use collab_file_commits.sh to find all of the people who are collaborating on the same files.
+* collab_file_commits.sh: use to find all of the people who are collaborating on the same files.
 It takes output from either files_committed script as input. WARNING: this can generate a massive
 amount of data for people who have edited a lot of files or contributed to frequently edited files.
-
+* de-dup-email.sh: also works with output from CVSAnaly. I use it on the output from both of the above
+scripts
 
