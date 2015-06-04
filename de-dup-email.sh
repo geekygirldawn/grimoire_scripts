@@ -62,5 +62,5 @@ cp $FILE $OUTFILE
 # looking for emails surrounded by commas to avoid mangling message_id fields, which sometimes has email.
 
 while read EMAIL1 EMAIL2 COMMENT; do
-   sed -i '.bak' "s/,$EMAIL1,/,$EMAIL2,/g" $OUTFILE
+   perl -pi -e 's/,$EMAIL1,/,$EMAIL2,/g' $OUTFILE
 done < $ALIASES
