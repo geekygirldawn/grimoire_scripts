@@ -11,7 +11,8 @@
 #       is being used to sanitize the output. I will only work in certain cases, and maybe only for me :)
 
 # -i, --inputfile	FILE: Set the input filename (CSV file) where you want to do the search and replace
-#			This file should be of the form (per line): thread subect,email,date,message_id
+#			This file should be of a form (per line), similar to: thread subect,email,date,message_id
+#			Most importantly, the file must be comma separated and contain email addresses.
 # -o, --outputfile	OUTFILE: Set the filename for the output file as OUTFILE where 
 #			you want to store clean text. Note: sed also creates a .bak while editing this file
 # -e, --email-aliases	ALIASES: The file where the email aliases are stored. 
