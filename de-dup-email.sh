@@ -13,6 +13,7 @@
 # -i, --inputfile	FILE: Set the input filename (CSV file) where you want to do the search and replace
 #			This file should be of a form (per line), similar to: thread subect,email,date,message_id
 #			Most importantly, the file must be comma separated and contain email addresses.
+#			Email should not be in the first column
 # -o, --outputfile	OUTFILE: Set the filename for the output file as OUTFILE where 
 #			you want to store clean text. Note: sed also creates a .bak while editing this file
 # -e, --email-aliases	ALIASES: The file where the email aliases are stored. 
@@ -62,5 +63,5 @@ cp $FILE $OUTFILE
 # looking for emails surrounded by commas to avoid mangling message_id fields, which sometimes has email.
 
 while read EMAIL1 EMAIL2 COMMENT; do
-   perl -pi -e 's/,$EMAIL1,/,$EMAIL2,/g' $OUTFILE
+   perl -pi -e 's/,$EMAIL1/,$EMAIL2/g' $OUTFILE
 done < $ALIASES
