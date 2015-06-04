@@ -123,14 +123,18 @@ sed 1d $FILE | while read line; do
    ((i++))
 done
 
+# Replace any existing commas with spaces
+
+sed -i '.bak' "s/,/ /g" /tmp/outfile.tsv
+
 # Convert file from tab delimited to comma delimited. What looks like a space is an embedded tab, since
 # MacOS can't handle \t
 
 sed 's/	/,/g' /tmp/outfile.tsv > $OUTFILE
 
-# cleanup and remove temp file
+# cleanup and remove temp files
 
-rm /tmp/outfile.tsv
+rm /tmp/outfile.tsv /tmp/outfile.tsv.bak
 
 # reset IFS back to original value before ending script.
 
