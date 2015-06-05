@@ -17,7 +17,7 @@
 # -o, --outputfile	OUTFILE: Set the filename for the output file as OUTFILE where 
 #			you want to store clean text. Note: sed also creates a .bak while editing this file
 # -e, --email-aliases	ALIASES: The file where the email aliases are stored. 
-#			Each line should contain: old@example.com new@example.com # optional comment	
+#			Each line should contain: old@example.com,new@example.com,# optional comment	
 
 # Read arguments from the command line and store them in variables
 
@@ -57,11 +57,21 @@ echo "Output stored in $OUTFILE"
 
 cp $FILE $OUTFILE
 
+# use comma as separator, but first store original IFS to restore it later.
+
+OIFS=$IFS
+IFS=,
+
 # loop through email-aliases file, look for people with multiple email addresses
 # and set them to a single email address in the output file. 
 # email-aliases file contains mappings of email addresses.
 # looking for emails surrounded by commas to avoid mangling message_id fields, which sometimes has email.
 
 while read EMAIL1 EMAIL2 COMMENT; do
-   perl -pi -e 's/,$EMAIL1/,$EMAIL2/g' $OUTFILE
+   perl -pi -e "s/$EMAIL1/$EMAIL2/g" $OUTFILE
+   echo "$EMAIL1 to $EMAIL2"
 done < $ALIASES
+
+# reset IFS back to original setting
+
+IFS=$OIFS
