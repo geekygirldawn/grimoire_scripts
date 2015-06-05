@@ -68,8 +68,7 @@ IFS=,
 # looking for emails surrounded by commas to avoid mangling message_id fields, which sometimes has email.
 
 while read EMAIL1 EMAIL2 COMMENT; do
-   perl -pi -e "s/$EMAIL1/$EMAIL2/g" $OUTFILE
-   echo "$EMAIL1 to $EMAIL2"
+   sed -i -e "s/$EMAIL1/$EMAIL2/g" $OUTFILE
 done < $ALIASES
 
 # reset IFS back to original setting
