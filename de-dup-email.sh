@@ -3,6 +3,8 @@
 # Copyright (C) 2015 Dawn M. Foster
 # Licensed under GNU General Public License (GPL), version 3 or later: http://www.gnu.org/licenses/gpl.txt
 
+# CAVEAT: Because sed isn't particularly portable (sigh), this only works on Linux, not MacOS right now.
+
 # The purpose of this script is to make sure I have one email address per person in my mlstats
 # output, so for people using multiple email addresses, replace one email address with a 
 # single main email address.
@@ -13,7 +15,8 @@
 # -i, --inputfile	FILE: Set the input filename (CSV file) where you want to do the search and replace
 #			This file should be of a form (per line), similar to: thread subect,email,date,message_id
 #			Most importantly, the file must be comma separated and contain email addresses.
-#			Email should not be in the first column
+#			CAUTION: if you have any other fields that contain email addresses, like mlstats message_id
+#				This will clobber that field as well. You may need to tweak the sed command in this case.
 # -o, --outputfile	OUTFILE: Set the filename for the output file as OUTFILE where 
 #			you want to store clean text. Note: sed also creates a .bak while editing this file
 # -e, --email-aliases	ALIASES: The file where the email aliases are stored. 
@@ -65,7 +68,6 @@ IFS=,
 # loop through email-aliases file, look for people with multiple email addresses
 # and set them to a single email address in the output file. 
 # email-aliases file contains mappings of email addresses.
-# looking for emails surrounded by commas to avoid mangling message_id fields, which sometimes has email.
 
 while read EMAIL1 EMAIL2 COMMENT; do
    sed -i -e "s/$EMAIL1/$EMAIL2/g" $OUTFILE
