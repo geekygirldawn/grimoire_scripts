@@ -49,6 +49,17 @@ esac
 shift
 done
 
+# If outfile exists, make a backup and remove outfile to avoid appending new data to an old file.
+
+if [ -f "$OUTFILE" ]
+then
+   cp $OUTFILE /tmp/outputfile.bak
+   rm $OUTFILE
+   echo ""
+   echo "Your output file already existed. Original file moved to /tmp/outputfile.bak" 
+   echo ""
+fi
+
 # output message to make sure user has the correct details
 
 echo "Reading input from $FILE"
