@@ -3,6 +3,7 @@
 # Copyright (C) 2015 Dawn M. Foster
 # Licensed under GNU General Public License (GPL), version 3 or later: http://www.gnu.org/licenses/gpl.txt
 
+# DEPRECATED: I recommend that you use the current Python version, de-dup-email.py
 # CAVEAT: Because sed isn't particularly portable (sigh), this only works on Linux, not MacOS right now.
 
 # The purpose of this script is to make sure I have one email address per person in my mlstats
