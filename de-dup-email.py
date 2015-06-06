@@ -60,7 +60,7 @@ def main(argv):
 
     print 'Reading input from file', input_file
     print 'Transforming using file', aliases_file
-    print 'Reading output from file', output_file
+    print 'Writing output to file', output_file
 
 
     # Copy the input_file to the output_file to leave the original file intact.
