@@ -66,7 +66,7 @@ def main(argv):
     # Copy the input_file to the output_file to leave the original file intact.
     # If output_file exists, make a backup copy
 
-    if os.path.isfile:
+    if os.path.isfile(output_file):
         shutil.copyfile(output_file, '/tmp/outputfile.bak')
         print 'Output file already exists. Original was backed up at /tmp/outputfile.bak'
 
