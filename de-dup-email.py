@@ -66,11 +66,11 @@ def main(argv):
     # Copy the input_file to the output_file to leave the original file intact.
     # If output_file exists, make a backup copy
 
-    shutil.copyfile(input_file, output_file)
-
     if os.path.isfile:
         shutil.copyfile(output_file, '/tmp/outputfile.bak')
         print 'Output file already exists. Original was backed up at /tmp/outputfile.bak'
+
+    shutil.copyfile(input_file, output_file)
 
     aliases = open(aliases_file, 'rb')
 
